@@ -57,10 +57,20 @@ public class Player : MonoBehaviour
             {
                 yield return new WaitForSeconds(1);
 
-                GameObject x = Instantiate(playerPrefab, transform.position, Quaternion.identity);
+                // We don't want to spawn the new body on the exact same position as the head.
+                // because then in the CheckCollision script it'll think that the head is colliding with the body part that just spawned
+                // and immidiately count it as a loss. In a way this is working around bugs :)
+                // This WILL break collision detection so we take the 0.0f away from the transform.position.x in the PositionTracker class
+                GameObject x = Instantiate(playerPrefab, new Vector3(transform.position.x + GV.extraFloatOnSpawn, transform.position.y), Quaternion.identity);
+                
+                
                 x.GetComponent<Player>().enabled = false;
                 x.GetComponent<BoxCollider2D>().enabled = false;
                 bodies.Add(x);
+            }
+            else
+            {
+                yield return new WaitForSeconds(1);
             }
         }
 
@@ -72,97 +82,96 @@ public class Player : MonoBehaviour
 
         while (true)
         {
-            if (GV.isStarted) {
-                // This makes sure that the delay in the while loop is the same in every single client.
-                // This means that the game speed is the same on bad and good devices
+            // This makes sure that the delay in the while loop is the same in every single client.
+            // This means that the game speed is the same on bad and good devices
+            if (GV.isStarted)
+            {
                 timeAccumulator += Time.deltaTime;
+            }
 
-                while (timeAccumulator >= timeStep)
+            while (timeAccumulator >= timeStep)
+            {
+                // The movement
+                Vector2 position = transform.position;
+                float x = position.x;
+                float y = position.y;
+
+                switch (direction)
                 {
-                    // The movement
-                    Vector2 position = transform.position;
-                    float x = position.x;
-                    float y = position.y;
+                    case Directions.Direction.LEFT:
+                        position.x -= transform.localScale.x;
+                        transform.position = position;
+                        break;
 
-                    switch (direction)
-                    {
-                        case Directions.Direction.LEFT:
-                            position.x -= transform.localScale.x;
-                            transform.position = position;
-                            break;
+                    case Directions.Direction.RIGHT:
+                        position.x += transform.localScale.x;
+                        transform.position = position;
+                        break;
 
-                        case Directions.Direction.RIGHT:
-                            position.x += transform.localScale.x;
-                            transform.position = position;
-                            break;
+                    case Directions.Direction.UP:
+                        position.y += transform.localScale.y;
+                        transform.position = position;
+                        break;
 
-                        case Directions.Direction.UP:
-                            position.y += transform.localScale.y;
-                            transform.position = position;
-                            break;
-
-                        case Directions.Direction.DOWN:
-                            position.y -= transform.localScale.y;
-                            transform.position = position;
-                            break;
-                    }
-
-                    // We hit the left edge
-                    if (transform.position.x < -4.7918 && direction == Directions.Direction.LEFT)
-                    {
-                        transform.position = new Vector2(5.0582f, transform.position.y);
-                    }
-
-                    // We hit the right edge 
-                    if (transform.position.x > 5.0918 && direction == Directions.Direction.RIGHT)
-                    {
-                        transform.position = new Vector2(-5.0918f, transform.position.y);
-                    }
-
-                    // We hit the upper edge
-                    if (transform.position.y > 5.16 && direction == Directions.Direction.UP)
-                    {
-                        transform.position = new Vector2(transform.position.x, -4.8832f);
-                    }
-
-                    // We hit the bottom edge 
-                    if (transform.position.y < -4.86 && direction == Directions.Direction.DOWN)
-                    {
-                        transform.position = new Vector2(transform.position.x, 4.8832f);
-                    }
-
-
-
-
-
-                    // Now we want to move every gameObject as well
-                    foreach (GameObject i in bodies)
-                    {
-                        if (bodies[0].Equals(i))
-                        {
-                            // We want to do the head (so the first element) a little differently
-                            TP.previousX = x;
-                            TP.previousY = y;
-                            TP.x = transform.position.x;
-                            TP.y = transform.position.y;
-                        }
-                        else
-                        {
-                            i.GetComponent<PositionTracker>().move();
-                        }
-
-                    }
-
-                    // Might wanna run this from a seperate thread :/
-                    PS.share();
-
-
-
-                    timeAccumulator -= timeStep;
+                    case Directions.Direction.DOWN:
+                        position.y -= transform.localScale.y;
+                        transform.position = position;
+                        break;
                 }
 
-                yield return null;
+                // We hit the left edge
+                if (transform.position.x < -4.7918 && direction == Directions.Direction.LEFT)
+                {
+                    transform.position = new Vector2(5.0582f, transform.position.y);
+                }
+
+                // We hit the right edge 
+                if (transform.position.x > 5.0918 && direction == Directions.Direction.RIGHT)
+                {
+                    transform.position = new Vector2(-5.0918f, transform.position.y);
+                }
+
+                // We hit the upper edge
+                if (transform.position.y > 5.16 && direction == Directions.Direction.UP)
+                {
+                    transform.position = new Vector2(transform.position.x, -4.8832f);
+                }
+
+                // We hit the bottom edge 
+                if (transform.position.y < -4.86 && direction == Directions.Direction.DOWN)
+                {
+                    transform.position = new Vector2(transform.position.x, 4.8832f);
+                }
+
+
+                // Now we want to move every gameObject as well
+                foreach (GameObject i in bodies)
+                {
+                    if (bodies[0].Equals(i))
+                    {
+                        // We want to do the head (so the first element) a little differently
+                        TP.previousX = x;
+                        TP.previousY = y;
+                        TP.x = transform.position.x;
+                        TP.y = transform.position.y;
+                    }
+                    else
+                    {
+                        i.GetComponent<PositionTracker>().move();
+                    }
+
+                }
+
+                // Might wanna run this from a seperate thread :/
+                PS.share();
+
+
+
+                timeAccumulator -= timeStep;
             }
+
+            yield return null;
+            
 
 
         }

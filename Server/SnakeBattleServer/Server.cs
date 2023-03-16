@@ -65,13 +65,14 @@ namespace SnakeBattleServer
 
             if (message.Split("_")[0] == "gamestatus")
             {
-                
+                changeGameStatus(message);  
             }
            
         }
-
-        private void changeGameStatus(String message, IPEndPoint ip)
+        private void changeGameStatus(String message)
         {
+            Console.WriteLine(message);
+
             // message format: gamestatus_room_playerNum_event_info
             String[] splittedMessage = message.Split("_"); 
 
@@ -96,8 +97,6 @@ namespace SnakeBattleServer
                 {
                     case "win":
                         players[player - 1].playerState = playerStates.WIN;
-                        sendMessage(splittedMessage[0] + "_" + splittedMessage[1] + "_" + target + "_gameEnd_" + "win"
-                            , players[player - 1].ip);
                         
 
                         players[target - 1].playerState = playerStates.LOSE;
@@ -107,11 +106,8 @@ namespace SnakeBattleServer
                         break;
 
 
-                    case "lose":
-                        
+                    case "lose":              
                         players[player - 1].playerState = playerStates.LOSE;
-                        sendMessage(splittedMessage[0] + "_" + splittedMessage[1] + "_" + target + "_gameEnd_" + "lose"
-                            , players[player - 1].ip);
                         
 
                         players[target - 1].playerState = playerStates.WIN;
@@ -124,8 +120,6 @@ namespace SnakeBattleServer
 
                     case "tie":
                         players[player - 1].playerState = playerStates.TIE;
-                        sendMessage(splittedMessage[0] + "_" + splittedMessage[1] + "_" + target + "_gameEnd_" + "tie"
-                            , players[player - 1].ip);
 
 
                         players[target - 1].playerState = playerStates.LOSE;
@@ -150,7 +144,8 @@ namespace SnakeBattleServer
             // The message: positions_roomNumber_playerNum_actualPositionsString
             // We get all the users in the room and send the same message to the other person in the same room
             // If both players do this then we'll create a chain of them sending each other the accurate positions (via the server of course)
-            Console.WriteLine(message);
+            
+            // Console.WriteLine(message);
 
             int roomNum = int.Parse(message.Split("_")[1]);
             int playerNum = int.Parse(message.Split("_")[2]);
@@ -222,6 +217,8 @@ namespace SnakeBattleServer
 
 
                 // We can start the game
+                // This appears to be bugged still
+                // It messes up if there is more than one room active, I am not sure why yet...
                 if (roomArray[0] != null && roomArray[1] == null)
                 {
                     Player[] players = this.connection[room];

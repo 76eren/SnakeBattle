@@ -13,13 +13,17 @@ public class CheckCollisions : MonoBehaviour
     public ClientSocket socket;
     private int room;
 
-    public GlobalVariables GV;
+    private GameState GS;
 
     
+        //------------------\\
+       // *SCREAMS IN JAVA*  \\
+      //----------------------\\
     public void setPlayers(List<GameObject> p)
     {
         this.players = p;
         this.room = socket._room;
+        this.GS = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameState>();
     }
 
     public void setEnemies(List<GameObject> p)
@@ -35,7 +39,7 @@ public class CheckCollisions : MonoBehaviour
     // Update is called once per frame
     public void checkCollisions()
     {
-
+        // Checks for collisions and determines if the game is a win/loss/tie.
         if (this.players.Count != 0 && this.enemies.Count != 0)
         {
             Vector3 playerPos = this.players.FirstOrDefault().transform.position;
@@ -45,8 +49,8 @@ public class CheckCollisions : MonoBehaviour
             if (playerPos == enemyHead)
             {
                 print("IT TIED");
-                socket.sendToServer("gamestatus_" + this.room + "_" + socket.playerNum + "_tie");
-                // GV.isStarted = false;
+                this.GS.endGame("gamestatus_" + this.room + "_" + socket.playerNum + "_gameEnd_tie", true);
+                return;
             }
 
             // Check if player collides with enemy
@@ -56,11 +60,11 @@ public class CheckCollisions : MonoBehaviour
                 {
                     // ENEMY WON, YOU LOSE
                     print("Enemey won!");
-                    socket.sendToServer("gamestatus_" + this.room + "_" + socket.playerNum + "_lose");
-                    // GV.isStarted = false;
+                    this.GS.endGame("gamestatus_" + this.room + "_" + socket.playerNum + "_gameEnd_lose", true); // _lose as in we lost
                     break;
                 }
             }
+
 
             foreach (var i in this.players)
             {
@@ -68,11 +72,24 @@ public class CheckCollisions : MonoBehaviour
                 {
                     // ENEMY LOST, YOU WIN
                     print("YOU WON");
-                    socket.sendToServer("gamestatus_" + this.room + "_" + socket.playerNum + "_win");
-                    //GV.isStarted = false;
+                    this.GS.endGame("gamestatus_" + this.room + "_" + socket.playerNum + "_gameEnd_win", true); // _win as in we won                 
                     break;
                 }
             }
+
+            // Check if player collides with itself
+            foreach (var i in this.players)
+            {
+                if (i.transform.position == playerPos && i != this.players.FirstOrDefault())
+                {
+                    // ENEMY WON, YOU LOSE
+                    print("Enemey won!");
+                    this.GS.endGame("gamestatus_" + this.room + "_" + socket.playerNum + "_gameEnd_lose", true); // _lose as in we lost
+                    break;
+                }              
+            }
+
+
 
 
         }
