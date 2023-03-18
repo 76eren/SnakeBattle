@@ -63,7 +63,7 @@ public class ClientSocket : MonoBehaviour
             this._room = int.Parse(IF.text);
 
             this.client = new UdpClient();
-            this.ep = new IPEndPoint(IPAddress.Parse("209.250.240.118"), 11000); // 209.250.240.118
+            this.ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000); // 209.250.240.118
             this.client.Connect(ep);
 
             // send data

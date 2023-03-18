@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace SnakeBattleServer
 {
@@ -20,6 +21,8 @@ namespace SnakeBattleServer
             this.connection = new Dictionary<int, Player[]>();
             this.udpServer = new UdpClient(11000);
         }
+
+      
   
 
         public void getMessage()
@@ -30,7 +33,7 @@ namespace SnakeBattleServer
                 var data = this.udpServer.Receive(ref remoteEP); // listen on port 11000
                 string messageReceived = Encoding.ASCII.GetString(data);
 
-                //  Console.WriteLine("Host: " + remoteEP.ToString() + " Data: " + messageReceived);
+                // Console.WriteLine("Host: " + remoteEP.ToString() + " Data: " + messageReceived);
 
                 // We don't want blocking code
                 Thread newThread = new Thread (() => {
@@ -201,16 +204,20 @@ namespace SnakeBattleServer
                 string playernum = "";
                 if (roomArray[0] == null && roomArray[1] == null)
                 {
+                    Console.WriteLine("ADDING NEW PLAYER 1");
                     this.connection.Add(room, new Player[] { new Player(room, ipEndpoint), null});
                     playernum = "1";
                 }
+
                 else if (roomArray[0] != null && roomArray[1] == null)
                 {
+                    Console.WriteLine("Adding new player 2");
+
                     // We store player 1
                     Player player1 = roomArray[0];
 
                     // We update the connection
-                    this.connection[1] = new Player[] { player1, new Player(room, ipEndpoint) };
+                    this.connection[room] = new Player[] { player1, new Player(room, ipEndpoint) };
                     playernum = "2";
                 }
                 sendMessage("joinRoom_1_"+playernum, ipEndpoint);
@@ -221,7 +228,9 @@ namespace SnakeBattleServer
                 // It messes up if there is more than one room active, I am not sure why yet...
                 if (roomArray[0] != null && roomArray[1] == null)
                 {
+                    Console.WriteLine("ROOM IS: " + room);
                     Player[] players = this.connection[room];
+                    Console.WriteLine(players);
                     foreach (Player i in players)
                     {
                         Console.WriteLine("Sending start signal");

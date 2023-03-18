@@ -23,6 +23,15 @@ public class PositionsCollector : MonoBehaviour
     private void Start()
     {
         checkCollisions = GetComponent<CheckCollisions>();
+
+
+        // Believe it or not we actually need this.
+        // In my case when I had my system language on Dutch it would save floats such as 5.4 as 5,4 breaking some of the code
+        // I found this out by accident by the way
+        // Alternatively I could've just replaced the "," with somehting like a # or other character when splitting the positions
+        System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("en-US");
+        System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+        System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
     }
 
     // Needs to be ran from the main thread
