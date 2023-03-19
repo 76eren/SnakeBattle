@@ -12,8 +12,17 @@ public class GameState : MonoBehaviour
 
     public Text text;
     public GameObject textGameobject;
-
+    public GameObject restartgameButton;
     private bool canEnable = false;
+    private string textToWrite = "";
+
+    // A reference to most variables needed for restarting
+    private bool canRestart = false;
+    public PositionsCollector PC;
+    public PositionsSharer PS;
+    public PositionTracker PT;
+    public CheckCollisions CC;
+    public Player player;
 
     private void Start()
     {
@@ -27,7 +36,25 @@ public class GameState : MonoBehaviour
         if (canEnable)
         {
             canEnable = false;
+            text.text = textToWrite;
             textGameobject.active = true;
+            restartgameButton.active = true;
+        }
+
+        if (canRestart)
+        {
+            canRestart = false;
+
+            player.reset();
+            PT.reset();
+            PC.reset();
+
+            textGameobject.active = false;
+            restartgameButton.active = false;
+
+            GV.isStarted = true;
+
+
         }
     }
 
@@ -42,17 +69,17 @@ public class GameState : MonoBehaviour
             switch (message.Split("_")[4])
             {
                 case "win":
-                    text.text = "YOU WON";
+                    textToWrite = "YOU WON";
                     break;
 
 
                 case "lose":
-                    text.text = "YOU LOST";
+                    textToWrite = "YOU LOST";
                     break;
 
 
                 case "tie":
-                    text.text = "TIE";
+                    textToWrite = "TIE";
                     break;
             }
 
@@ -67,7 +94,10 @@ public class GameState : MonoBehaviour
 
     public void restartGame()
     {
-
+        print("GOT THE RESTART SIGNAL, I AM GOING ALL HOG");
+        // Code to restart the game
+        canRestart = true;
+     
     }
 
 

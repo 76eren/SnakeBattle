@@ -5,14 +5,9 @@ using UnityEngine;
 
 public class PositionsCollector : MonoBehaviour
 {
+    // Contains the enemy gameobjects
     private List<GameObject> positions = new List<GameObject>();
-    
-    public List<GameObject> _positions {
-        get {return positions;} 
-        set { this.positions = value; }
-    }
-
-    private string positions_string = "";
+   
     public GameObject enemyGameobject;
 
     private bool canUpdate = false;
@@ -42,9 +37,6 @@ public class PositionsCollector : MonoBehaviour
             List<GameObject> tempPositions = this.positions;
 
             canUpdate = false;
-
-            this.positions_string = message;
-
 
             // First we need to delete all Gameobjects in our positions list
             foreach (var position in tempPositions)
@@ -85,11 +77,22 @@ public class PositionsCollector : MonoBehaviour
 
     public void updateEnemeyPositions(string message)
     {
+        print("UPDATING ALREADY LMAO");
+        print(message);
         // The message format: positions_roomNumber_playerNum_actualPositionsString
         canUpdate=true;
-        this.message = message;
-            
-        
+        this.message = message;          
+    }
+
+    public void reset()
+    {
+        foreach (GameObject i in this.positions)
+        {
+            Destroy(i);
+        }
+
+        this.positions.Clear();
+        this.message = "";
     }
     
 

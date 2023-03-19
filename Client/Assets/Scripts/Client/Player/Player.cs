@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -22,6 +23,10 @@ public class Player : MonoBehaviour
 
     public GlobalVariables GV;
     private GameObject controller;
+
+    // For the restarting 
+    private Vector2 initialLocation;
+    private Directions.Direction initialDirection;
    
 
     void Start()
@@ -40,6 +45,9 @@ public class Player : MonoBehaviour
             direction = Directions.Direction.LEFT;
         }
 
+        initialDirection = direction;
+        initialLocation = transform.position;
+
 
         bodies.Add(this.gameObject);
 
@@ -47,6 +55,26 @@ public class Player : MonoBehaviour
 
         StartCoroutine(moveSnake()); // Can't have delays in the update function
         StartCoroutine(spawnBody());
+    }
+
+    public void reset()
+    {
+        int index = 0;
+        foreach (GameObject i in this._bodies) {
+            // Don't want to destroy ourselves lmao
+            if (i == this._bodies.FirstOrDefault())
+            {
+                continue;
+            }
+            Destroy(i);
+        }
+
+        this.bodies.Clear();
+        this._bodies.Clear();
+        transform.position = this.initialLocation;
+        this.direction = this.initialDirection;
+        bodies.Add(this.gameObject);
+        print(this.bodies.ToArray());
     }
 
     IEnumerator spawnBody()
@@ -140,7 +168,7 @@ public class Player : MonoBehaviour
                 // We hit the bottom edge 
                 if (transform.position.y < -4.86 && direction == Directions.Direction.DOWN)
                 {
-                    transform.position = new Vector2(transform.position.x, 4.8832f);
+                    transform.position = new Vector2(transform.position.x, 4.9168f);
                 }
 
 

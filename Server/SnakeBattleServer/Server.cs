@@ -70,19 +70,27 @@ namespace SnakeBattleServer
             {
                 changeGameStatus(message);  
             }
+
+       
            
         }
+
+        
+
         private void changeGameStatus(String message)
         {
             Console.WriteLine(message);
 
             // message format: gamestatus_room_playerNum_event_info
-            String[] splittedMessage = message.Split("_"); 
+            String[] splittedMessage = message.Split("_");
+
+            int room = int.Parse(splittedMessage[1]);
+            int player = int.Parse(splittedMessage[2]);
+
 
             if (splittedMessage[3]  == "gameEnd")
             {
-                int room = int.Parse(splittedMessage[1]);
-                int player = int.Parse(splittedMessage[2]);
+
                 int target = 0;
                 if (player == 1)
                 {
@@ -135,8 +143,26 @@ namespace SnakeBattleServer
             }
 
 
-            if (message.Split("_")[3] == "gameReset")
+            if (message.Split("_")[3] == "restart")
             {
+                this.connection[room][player - 1]._wantToRestart = true;
+
+                // we check if all players are ready to restart, if so we can send the restart signal
+                int n = 0;
+                foreach (Player i in this.connection[room])
+                {
+                    if (i._wantToRestart) { n++; }
+                }
+
+                // This means we are ready to restart the match
+                if (n==2)
+                {
+                    foreach (Player i in this.connection[room])
+                    {
+                        i._wantToRestart = false;
+                        sendMessage("restart", i.ip);
+                    }
+                }
 
             }
         }

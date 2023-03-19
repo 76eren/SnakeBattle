@@ -15,6 +15,9 @@ public class ClientSocket : MonoBehaviour
     public GameObject text;
     public InputField IF;
     public GameObject inputField;
+    public InputField IPif;
+    public GameObject IPifGO;
+    public GameObject IpText;
 
     // References to game objects
     public GameObject player;
@@ -29,6 +32,7 @@ public class ClientSocket : MonoBehaviour
         get { return room; }    
         set { room = value; }
     }
+    private string serverIP;
 
 
     private UdpClient client;
@@ -61,9 +65,10 @@ public class ClientSocket : MonoBehaviour
         Thread thread = new Thread (() => {
 
             this._room = int.Parse(IF.text);
+            this.serverIP = IPif.text;
 
             this.client = new UdpClient();
-            this.ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000); // 209.250.240.118
+            this.ep = new IPEndPoint(IPAddress.Parse(this.serverIP), 11000); // 209.250.240.118
             this.client.Connect(ep);
 
             // send data
@@ -117,6 +122,7 @@ public class ClientSocket : MonoBehaviour
     }
 
 
+
     private void listenToServer()
     {
         while (true)
@@ -150,8 +156,18 @@ public class ClientSocket : MonoBehaviour
         {
             GS.endGame(message, false);
         }
+
+        if (message.Split("_")[0] == "restart")
+        {
+            GS.restartGame();
+        }
     }
 
+    public void sendRestartGameSignal()
+    {
+        // Message format: gamestatus_room_playerNum_event_info                       
+        sendToServer("gamestatus_" + this._room + "_" + this.playerNum + "_restart_1");
+    }
 
 
     private void Update() 
@@ -164,6 +180,8 @@ public class ClientSocket : MonoBehaviour
             button.SetActive(false);
             text.SetActive(false);
             inputField.SetActive(false);
+            IPifGO.SetActive(false);
+            IpText.SetActive(false);
 
 
             isListening = true;
@@ -191,5 +209,7 @@ public class ClientSocket : MonoBehaviour
 
         }
     }
+
+
 
 }

@@ -12,17 +12,29 @@ public class PositionTracker : MonoBehaviour
     [HideInInspector] public float previousY;
 
     private GlobalVariables GV;
-     
+
+    // Saves the initials for the restarting
+    private float initialX;
+    private float initialY;
+    private float initialPreviousX;
+    private float initialPreviousY;
 
     private void Start()
     {
-        x = transform.position.x;
-        y = transform.position.y;
+        this.x = transform.position.x;
+        this.y = transform.position.y;
 
-        previousX = x;
-        previousY = y;
+        this.previousX = x;
+        this.previousY = y;
 
-        GV = GameObject.FindGameObjectWithTag("GameController").GetComponent<GlobalVariables>();
+        // For the restarting later
+        this.initialX = x;
+        this.initialY = y;
+        this.initialPreviousX = previousX;
+        this.initialPreviousY = previousY;
+        
+
+        this.GV = GameObject.FindGameObjectWithTag("GameController").GetComponent<GlobalVariables>();
     }
 
     public void move()
@@ -44,6 +56,14 @@ public class PositionTracker : MonoBehaviour
 
         transform.position = new Vector2(this.x, this.y);
 
+    }
+
+    public void reset()
+    {
+        this.x = this.initialX;
+        this.y = this.initialY;
+        this.previousX = this.initialPreviousX;
+        this.previousY = this.initialPreviousY;
     }
 
 }

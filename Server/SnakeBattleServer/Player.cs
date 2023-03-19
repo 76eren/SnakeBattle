@@ -17,6 +17,15 @@ namespace SnakeBattleServer
         public IPEndPoint ip;
         public playerStates playerState;
 
+
+        private bool wantsToRestart;
+        public bool _wantToRestart
+        {
+            get { return wantsToRestart; }
+            set { this.wantsToRestart = value; }
+        }
+
+
         public Player(int room, IPEndPoint iPEndPoint)
         {
             this.room = room;

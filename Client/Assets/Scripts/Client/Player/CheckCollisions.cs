@@ -36,6 +36,8 @@ public class CheckCollisions : MonoBehaviour
         player = GetComponent<Player>(); 
     }
 
+
+
     // Update is called once per frame
     public void checkCollisions()
     {
