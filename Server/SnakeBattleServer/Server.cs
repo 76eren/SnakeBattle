@@ -250,8 +250,6 @@ namespace SnakeBattleServer
 
 
                 // We can start the game
-                // This appears to be bugged still
-                // It messes up if there is more than one room active, I am not sure why yet...
                 if (roomArray[0] != null && roomArray[1] == null)
                 {
                     Console.WriteLine("ROOM IS: " + room);
